@@ -10,7 +10,7 @@
 
 * [webtorrent](https://webtorrent.io/) `npm install webtorrent-cli -g`
 * libnotify-dev
-* mpv
+* vlc
 
 ## Installation
 
