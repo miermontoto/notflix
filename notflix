@@ -1,10 +1,10 @@
 #!/bin/sh
 
-# Dependencies - webtorrent, libnotify-dev, vlc
+# Dependencies - webtorrent, libnotify-dev, vlc, rofi
 
 mkdir -p $HOME/.cache/notflix
 
-menu="rofi -show -dmenu -p Results"
+menu="rofi -show dmenu -p Results"
 #menu="dmenu -i -l 25"
 baseurl="https://1337x.to"
 cachedir="$HOME/.cache/notflix"
