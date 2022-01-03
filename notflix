@@ -1,51 +1,78 @@
 #!/bin/sh
 
-# Dependencies - webtorrent, libnotify-dev, vlc, rofi
-
-mkdir -p $HOME/.cache/notflix
-
-menu="rofi -show -dmenu -p"
+menu='rofi -show -dmenu -p'
+rofiUsed=1
 player=vlc
 numpages=1
 baseurl="https://1337x.to"
 cachedir="$HOME/.cache/notflix"
+notify=notify-send
+
+setup() {
+  mkdir -p $cachedir
+}
+
+cleanup() {
+  rm -rf $cachedir
+}
+
+isInstalled() {
+	which "$1" 2>/dev/null>&2
+}
+
+command -v "rofi" 2>/dev/null>&2 || rofiUsed=0 # dmenu is used if rofi is not found
+command -v "vlc" 2>/dev/null>&2 || player=mpv # mpv is used if vlc is not found
+command -v "notify-send" 2>/dev/null>&2 || notify=echo # use terminal to display messages if libnotify-dev is not found
+
+setup
+
+echo $searchmenu
+echo $selectmenu
 
 if [ -z $1 ]; then
-  query=$($menu "search")
+  if [ $rofiUsed -lt 1 ]; then
+    query=$(dmenu -p "search: " <&-)
+    menu="dmenu -i -l 25"
+  else
+    query=$($menu "search")
+    menu+=" select"
+  fi
 else
   query=$1
 fi
 
+# format query
 query="$(echo $query | sed 's/ /+/g')"
 
-#curl -s https://1337x.to/category-search/$query/Movies/1/ > $cachedir/tmp.html
+# cache query from 1337x
 curl -s $baseurl/search/$query/$numpages/ > $cachedir/tmp.html
 
-# Get Titles
+# grep titles
 grep -o '<a href="/torrent/.*</a>' $cachedir/tmp.html |
   sed 's/<[^>]*>//g' > $cachedir/titles.bw
 
+# check amount of magnets found
 result_count=$(wc -l $cachedir/titles.bw | awk '{print $1}')
 if [ "$result_count" -lt 1 ]; then
-  notify-send "notflix: no result found."
+  $notify "notflix: no result found."
   exit 0
 fi
 
-# Seeders and Leechers
+# get seeders and leechers for each magnet
 grep -o '<td class="coll-2 seeds.*</td>\|<td class="coll-3 leeches.*</td>' $cachedir/tmp.html |
   sed 's/<[^>]*>//g' | sed 'N;s/\n/ /' > $cachedir/seedleech.bw
 
-# Size
+# get disk size of torrent
 grep -o '<td class="coll-4 size.*</td>' $cachedir/tmp.html |
   sed 's/<span class="seeds">.*<\/span>//g' |
   sed -e 's/<[^>]*>//g' > $cachedir/size.bw
 
-# Links
+# get magnet links
 grep -E '/torrent/' $cachedir/tmp.html |
   sed -E 's#.*(/torrent/.*)/">.*/#\1#' |
   sed 's/td>//g' > $cachedir/links.bw
 
-# Clearning up some data to display
+# clear up data to display
 sed 's/\./ /g; s/\-/ /g' $cachedir/titles.bw |
   sed 's/[^A-Za-z0-9 ]//g' | tr -s " " > $cachedir/tmp && mv $cachedir/tmp $cachedir/titles.bw
 
@@ -54,14 +81,14 @@ awk '{print "[S:"$1 ", L:"$2"]" }' $cachedir/seedleech.bw > $cachedir/tmp && mv 
 
 # Getting the line number
 LINE=$(paste -d\   $cachedir/size.bw $cachedir/seedleech.bw $cachedir/titles.bw |
-  $menu "select" |
+  $menu |
   cut -d\- -f1 |
   awk '{$1=$1; print}')
 
 if [ -z "$LINE" ]; then
   exit 0
 fi
-#notify-send "🔍 Searching Magnet seeds 🧲" -i "NONE"
+#$notify "🔍 Searching Magnet seeds 🧲" -i "NONE"
 url=$(head -n $LINE $cachedir/links.bw | tail -n +$LINE)
 fullURL="${baseurl}${url}/"
 
@@ -69,6 +96,7 @@ fullURL="${baseurl}${url}/"
 curl -s $fullURL > $cachedir/tmp.html
 magnet=$(grep -Po "magnet:\?xt=urn:btih:[a-zA-Z0-9]*" $cachedir/tmp.html | head -n 1) 
 
-notify-send "notflix: launching webtorrent."
+$notify "notflix: launching webtorrent."
+cleanup
 webtorrent "$magnet" --$player 
 
