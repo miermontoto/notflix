@@ -5,7 +5,8 @@
 mkdir -p $HOME/.cache/notflix
 
 menu="rofi -show -dmenu -p"
-#menu="dmenu -i -l 25"
+player=mpv
+numpages=1
 baseurl="https://1337x.to"
 cachedir="$HOME/.cache/notflix"
 
@@ -18,7 +19,7 @@ fi
 query="$(echo $query | sed 's/ /+/g')"
 
 #curl -s https://1337x.to/category-search/$query/Movies/1/ > $cachedir/tmp.html
-curl -s $baseurl/search/$query/1/ > $cachedir/tmp.html
+curl -s $baseurl/search/$query/$numpages/ > $cachedir/tmp.html
 
 # Get Titles
 grep -o '<a href="/torrent/.*</a>' $cachedir/tmp.html |
@@ -68,5 +69,6 @@ fullURL="${baseurl}${url}/"
 curl -s $fullURL > $cachedir/tmp.html
 magnet=$(grep -Po "magnet:\?xt=urn:btih:[a-zA-Z0-9]*" $cachedir/tmp.html | head -n 1) 
 
-webtorrent "$magnet" --vlc 
-notify-send "notflix: launched webtorrent."
+notify-send "notflix: launching webtorrent."
+webtorrent "$magnet" --$player 
+
