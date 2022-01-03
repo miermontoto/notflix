@@ -10,7 +10,7 @@ baseurl="https://1337x.to"
 cachedir="$HOME/.cache/notflix"
 
 if [ -z $1 ]; then
-  query=$($menu "search" <&-)
+  query=$($menu "search")
 else
   query=$1
 fi
