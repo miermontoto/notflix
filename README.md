@@ -3,7 +3,7 @@
 
 ##
 <p align="center">
-<img src="./preview.gif" alt="Video Preview" width="500px">
+<img src="./example.gif" alt="Video Preview" width="500px">
 </p>
 
 ## Requirements
