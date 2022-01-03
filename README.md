@@ -18,7 +18,7 @@
 cURL **notflix** to your **$PATH** and give execute permissions.
 
 ```
-sudo curl -sL "https://raw.githubusercontent.com/miermontoto/master/notflix" -o /usr/local/bin/notflix
+sudo curl -sL "https://raw.githubusercontent.com/miermontoto/notflix/master/notflix" -o /usr/local/bin/notflix
 sudo chmod +x /usr/local/bin/notflix
 ```
 - To update, just redownload the script to $PATH.
