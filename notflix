@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Dependencies - webtorrent, libnotify-dev
+# Dependencies - webtorrent, libnotify-dev, vlc
 
 mkdir -p $HOME/.cache/notflix
 
