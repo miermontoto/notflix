@@ -5,7 +5,7 @@
 mkdir -p $HOME/.cache/notflix
 
 menu="rofi -show -dmenu -p"
-player=mpv
+player=vlc
 numpages=1
 baseurl="https://1337x.to"
 cachedir="$HOME/.cache/notflix"
