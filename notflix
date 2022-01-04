@@ -26,9 +26,6 @@ command -v "notify-send" 2>/dev/null>&2 || notify=echo # use terminal to display
 
 setup
 
-echo $searchmenu
-echo $selectmenu
-
 if [ -z $1 ]; then
   if [ $rofiUsed -lt 1 ]; then
     query=$(dmenu -p "search: " <&-)
@@ -88,7 +85,7 @@ LINE=$(paste -d\   $cachedir/size.bw $cachedir/seedleech.bw $cachedir/titles.bw 
 if [ -z "$LINE" ]; then
   exit 0
 fi
-#$notify "🔍 Searching Magnet seeds 🧲" -i "NONE"
+
 url=$(head -n $LINE $cachedir/links.bw | tail -n +$LINE)
 fullURL="${baseurl}${url}/"
 
