@@ -4,6 +4,7 @@ menu='rofi -show -dmenu -p'
 rofiUsed=1
 player=vlc
 numpages=1
+webtorrentNotFound=0
 baseurl="https://1337x.to"
 cachedir="$HOME/.cache/notflix"
 notify=notify-send
@@ -23,8 +24,13 @@ isInstalled() {
 command -v "rofi" 2>/dev/null>&2 || rofiUsed=0 # dmenu is used if rofi is not found
 command -v "vlc" 2>/dev/null>&2 || player=mpv # mpv is used if vlc is not found
 command -v "notify-send" 2>/dev/null>&2 || notify=echo # use terminal to display messages if libnotify-dev is not found
-
+command -v "webtorrent" || webtorrentNotFound=1
 setup
+
+if [ $webtorrentNotFound -gt 0 ]; then
+  $notify "notflix: could not find webtorrent."
+  exit 1
+fi
 
 if [ -z $1 ]; then
   if [ $rofiUsed -lt 1 ]; then
@@ -52,7 +58,7 @@ grep -o '<a href="/torrent/.*</a>' $cachedir/tmp.html |
 result_count=$(wc -l $cachedir/titles.bw | awk '{print $1}')
 if [ "$result_count" -lt 1 ]; then
   $notify "notflix: no result found."
-  exit 0
+  exit 2
 fi
 
 # get seeders and leechers for each magnet
