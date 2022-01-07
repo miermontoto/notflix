@@ -1,10 +1,7 @@
 <h1 align="center">notflix.</h1>
 <p align="center">search magnet links and stream them directly with webtorrent</p>
 
-##
-<p align="center">
-<img src="./example.gif" alt="Video Preview">
-</p>
+## <img src="./example.gif" align="center">
 
 ## Requirements
 
