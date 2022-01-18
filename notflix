@@ -1,63 +1,80 @@
 #!/bin/sh
 
 menu='rofi -show -dmenu -p'
-rofiUsed=1
-player=vlc
-numpages=1
-webtorrentNotFound=0
+useRofi=true # change to false to use dmenu instead of rofi as input
+player=vlc # default player is vlc
 baseurl="https://1337x.to"
 cachedir="$HOME/.cache/notflix"
-notify=notify-send
+notify=true
 
 setup() {
   mkdir -p $cachedir
 }
 
 cleanup() {
-  rm -rf $cachedir
+  rm -r $cachedir
+}
+
+notify() {
+  echo $1
+  [ "$notify" = true ] && notify-send "$1"
 }
 
 isInstalled() {
-	which "$1" 2>/dev/null>&2
+	command -v "$1" 2>/dev/null>&2
 }
 
-command -v "rofi" 2>/dev/null>&2 || rofiUsed=0 # dmenu is used if rofi is not found
-command -v "vlc" 2>/dev/null>&2 || player=mpv # mpv is used if vlc is not found
-command -v "notify-send" 2>/dev/null>&2 || notify=echo # use terminal to display messages if libnotify-dev is not found
-command -v "webtorrent" || webtorrentNotFound=1
+die() {
+  notify "$1"
+  exit 0
+}
+
+checkDependencies() {
+  isInstalled "webtorrent" || (notify "notflix: could not find webtorrent." && exit 1)
+  isInstalled "rofi" || useRofi=false # use dmenu if rofi is not found
+  isInstalled "vlc"  || player=mpv # use mpv if vlc is not found
+  isInstalled "notify-send" || notify=false # only use 'echo' to display messages if libnotify-dev is not found
+
+  if [ "$player" == "mpv" ]; then # if either vlc was not found or mpv was set as the player, exit if mpv is not found
+    isInstalled "mpv" || die "notflix: could not find vlc/mpv."
+    echo "notflix: using mpv instead of vlc."
+    # if using mpv, only notify through cli, as it could have been set this way by the user.
+  fi
+
+  if [ "$useRofi" = false ]; then 
+    isInstalled "dmenu" || die "notflix: could not find rofi/dmenu."
+  fi
+}
+
+checkConnection() {
+  result=$(curl -s -o /dev/null -w "%{http_code}" $baseurl) 
+  [ "$result" == "200" ] || die "notflix: could not connect to 1337x.to."
+}
+
+checkDependencies
+checkConnection
 setup
 
-if [ $webtorrentNotFound -gt 0 ]; then
-  $notify "notflix: could not find webtorrent."
-  exit 1
-fi
-
-if [ -z $1 ]; then
-  if [ $rofiUsed -lt 1 ]; then
-    query=$(dmenu -p "search: " <&-)
-    menu="dmenu -i -l 25"
-  else
-    query=$($menu "search")
-    menu+=" select"
-  fi
+if [ "$useRofi" = false ]; then
+  query=$(dmenu -p "search: " <&-)
+  menu="dmenu -i -l 25"
 else
-  query=$1
+  query=$($menu "search")
+  menu+=" select"
 fi
 
-# format query
-query="$(echo $query | sed 's/ /+/g')"
 
-# cache query from 1337x
-curl -s $baseurl/search/$query/$numpages/ > $cachedir/tmp.html
+[ -z "$query" ] && exit 0 # silently exit if user quits
+query="$(echo $query | sed 's/ /+/g')" # format query
+curl -s $baseurl/search/$query/1/ > $cachedir/tmp.html # cache query from 1337x
 
 # grep titles
-grep -o '<a href="/torrent/.*</a>' $cachedir/tmp.html |
+grep -o '<a href="/torrent/.*</a>' $cachedir/tmp.html | 
   sed 's/<[^>]*>//g' > $cachedir/titles.bw
-
 # check amount of magnets found
 result_count=$(wc -l $cachedir/titles.bw | awk '{print $1}')
 if [ "$result_count" -lt 1 ]; then
-  $notify "notflix: no result found."
+  notify "notflix: no result found."
   exit 2
 fi
 
@@ -88,18 +105,15 @@ LINE=$(paste -d\   $cachedir/size.bw $cachedir/seedleech.bw $cachedir/titles.bw 
   cut -d\- -f1 |
   awk '{$1=$1; print}')
 
-if [ -z "$LINE" ]; then
-  exit 0
-fi
-
+[ -z "$LINE" ] && exit 0
 url=$(head -n $LINE $cachedir/links.bw | tail -n +$LINE)
 fullURL="${baseurl}${url}/"
 
 # Requesting page for magnet link
 curl -s $fullURL > $cachedir/tmp.html
-magnet=$(grep -Po "magnet:\?xt=urn:btih:[a-zA-Z0-9]*" $cachedir/tmp.html | head -n 1) 
+magnet=$(grep -Po "magnet:\?xt=urn:btih:[a-zA-Z0-9]*" $cachedir/tmp.html | head -n 1)
 
-$notify "notflix: launching webtorrent."
-cleanup
-webtorrent "$magnet" --$player 
+notify "notflix: launching webtorrent."
+cleanup # cleanup before launching webtorrent
+webtorrent "$magnet" --$player
 
