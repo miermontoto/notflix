@@ -5,7 +5,7 @@
 
 ## Requirements
 
-* [webtorrent](https://webtorrent.io/) `sudo npm i -g webtorrent-cli`
+* [webtorrent-cli](https://github.com/webtorrent/webtorrent-cli) `sudo npm i -g webtorrent-cli`
 * libnotify-bin (optional)
 * vlc (or mpv)
 * rofi (or dmenu)
@@ -21,7 +21,7 @@ sudo chmod +x /usr/local/bin/notflix
 ```
 
 ### make
-Clone this repository and copy the script to **$PATH**.
+Clone this repository and use `make` to copy the script to **$PATH**.
 ```
 git clone https://github.com/miermontoto/notflix..git
 cd notflix. && sudo make
@@ -31,5 +31,5 @@ cd notflix. && sudo make
 To uninstall, remove `notflix` from your **$PATH**  `sudo rm -f /usr/local/bin/notflix.`
 
 ## License
-This project is licensed under [GPL-3.0](https://raw.githubusercontent.com/Illumina/licenses/master/gpl-3.0.txt).
+This project is a fork of [Bugswriter's notflix](https://github.com/Bugswriter/notflix), which is licensed under [GPL-3.0](https://raw.githubusercontent.com/Illumina/licenses/master/gpl-3.0.txt).
 
