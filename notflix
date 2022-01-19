@@ -31,7 +31,7 @@ die() {
 }
 
 checkDependencies() {
-  isInstalled "webtorrent" || (notify "notflix: could not find webtorrent." && exit 1)
+  isInstalled "webtorrent" || die "notflix: could not find webtorrent."
   isInstalled "rofi" || useRofi=false # use dmenu if rofi is not found
   isInstalled "vlc"  || player=mpv # use mpv if vlc is not found
   isInstalled "notify-send" || notify=false # only use 'echo' to display messages if libnotify-dev is not found
