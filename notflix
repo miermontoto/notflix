@@ -1,11 +1,12 @@
 #!/bin/sh
 
-menu='rofi -show -dmenu -p'
+menu="rofi -show -dmenu -p "
 useRofi=true # change to false to use dmenu instead of rofi as input
 player=vlc # default player is vlc
 baseurl="https://1337x.to"
 cachedir="$HOME/.cache/notflix"
 notify=true
+
 
 setup() {
   mkdir -p $cachedir
@@ -115,5 +116,5 @@ magnet=$(grep -Po "magnet:\?xt=urn:btih:[a-zA-Z0-9]*" $cachedir/tmp.html | head 
 
 notify "notflix: launching webtorrent."
 cleanup # cleanup before launching webtorrent
-webtorrent "$magnet" --$player
+webtorrent "$magnet" --$player --not-on-top --playlist
 
