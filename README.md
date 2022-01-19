@@ -1,5 +1,5 @@
 <h1 align="center">notflix.</h1>
-<p align="center">search magnet links and stream them directly with webtorrent</p>
+<p align="center">search for magnet links and stream them directly with webtorrent</p>
 
 ## <img src="./example.gif" align="center">
 
@@ -21,7 +21,7 @@ sudo chmod +x /usr/local/bin/notflix
 ```
 
 ### make
-Clone this repository and copy the script directly.
+Clone this repository and copy the script to **$PATH**.
 ```
 git clone https://github.com/miermontoto/notflix..git
 cd notflix. && sudo make
