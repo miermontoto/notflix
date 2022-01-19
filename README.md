@@ -28,7 +28,7 @@ cd notflix. && sudo make
 ```
 
 ## Uninstallation
-To uninstall, remove `notflix` from your **$PATH**  `sudo rm -f /usr/local/bin/notflix.`
+To uninstall, remove `notflix` from your **$PATH**  `sudo rm -f /usr/local/bin/notflix`
 
 ## License
 This project is a fork of [Bugswriter's notflix](https://github.com/Bugswriter/notflix), which is licensed under [GPL-3.0](https://raw.githubusercontent.com/Illumina/licenses/master/gpl-3.0.txt).
