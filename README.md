@@ -16,7 +16,7 @@
 Download the script to your **$PATH** and give executable permissions.
 
 ```
-sudo curl -sL "https://raw.githubusercontent.com/miermontoto/notflix/master/notflix" -o /usr/local/bin/notflix
+sudo curl -sL "https://raw.githubusercontent.com/miermontoto/notflix./master/notflix" -o /usr/local/bin/notflix
 sudo chmod +x /usr/local/bin/notflix
 ```
 
