@@ -80,8 +80,7 @@ grep -o '<a href="/torrent/.*</a>' $cachedir/tmp.html |
 # check amount of magnets found
 result_count=$(wc -l $cachedir/titles.bw | awk '{print $1}')
 if [ "$result_count" -lt 1 ]; then
-  notify "no result found."
-  exit 2
+  die "no result found."
 fi
 
 # get seeders and leechers for each magnet
@@ -119,7 +118,7 @@ fullURL="${baseurl}${url}/"
 curl -s $fullURL > $cachedir/tmp.html
 magnet=$(grep -Po "magnet:\?xt=urn:btih:[a-zA-Z0-9]*" $cachedir/tmp.html | head -n 1)
 
-echo "launching webtorrent."
+echo "notflix: launching webtorrent."
 cleanup # cleanup before launching webtorrent
 webtorrent "$magnet" --$player --not-on-top --playlist
 
