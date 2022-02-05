@@ -5,6 +5,8 @@
 
 **This fork is maintained, but it won't keep up with upstream commits.**
 
+If you're having issues with rofi not inputting from keyboard, try adding `--normal-window` to rofi in the script, and then move to `$PATH`.
+
 ## Requirements
 
 * [webtorrent-cli](https://github.com/webtorrent/webtorrent-cli) `sudo npm i -g webtorrent-cli`
