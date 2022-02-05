@@ -17,8 +17,8 @@ cleanup() {
 }
 
 notify() {
-  echo $1
-  [ "$notify" = true ] && notify-send "$1"
+  echo "notflix:" "$1"
+  [ "$notify" = true ] && notify-send "notflix." "$1"
 }
 
 isInstalled() {
@@ -27,23 +27,23 @@ isInstalled() {
 
 die() {
   notify "$1"
-  exit 0
+  exit 1
 }
 
 checkDependencies() {
-  isInstalled "webtorrent" || die "notflix: could not find webtorrent."
+  isInstalled "webtorrent" || die "could not find webtorrent."
   isInstalled "rofi" || useRofi=false # use dmenu if rofi is not found
   isInstalled "vlc"  || player=mpv # use mpv if vlc is not found
   isInstalled "notify-send" || notify=false # only use 'echo' to display messages if libnotify-dev is not found
 
   if [ "$player" == "mpv" ]; then # if either vlc was not found or mpv was set as the player, exit if mpv is not found
-    isInstalled "mpv" || die "notflix: could not find vlc/mpv."
+    isInstalled "mpv" || die "could not find vlc/mpv."
     echo "notflix: using mpv instead of vlc."
     # if using mpv, only notify through cli, as it could have been set this way by the user.
   fi
 
   if [ "$useRofi" = false ]; then 
-    isInstalled "dmenu" || die "notflix: could not find rofi/dmenu."
+    isInstalled "dmenu" || die "could not find rofi/dmenu."
     echo "notflix: using dmenu instead of rofi."
   fi
 }
@@ -54,7 +54,7 @@ checkConnection() {
   [ "$result" == "200" ] || failed=true
   [ "$failed" = false ] || baseurl="https://1337x.gd/" 
   [ "$failed" = false ] || result=$(curl -s -o /dev/null -w "%{http_code}" $baseurl)
-  [ "$result" == "200" ] || die "notflix: could not connect to 1337x."
+  [ "$result" == "200" ] || die "could not connect to 1337x."
 }
 
 checkDependencies
@@ -80,7 +80,7 @@ grep -o '<a href="/torrent/.*</a>' $cachedir/tmp.html |
 # check amount of magnets found
 result_count=$(wc -l $cachedir/titles.bw | awk '{print $1}')
 if [ "$result_count" -lt 1 ]; then
-  notify "notflix: no result found."
+  notify "no result found."
   exit 2
 fi
 
@@ -119,7 +119,7 @@ fullURL="${baseurl}${url}/"
 curl -s $fullURL > $cachedir/tmp.html
 magnet=$(grep -Po "magnet:\?xt=urn:btih:[a-zA-Z0-9]*" $cachedir/tmp.html | head -n 1)
 
-echo "notflix: launching webtorrent."
+echo "launching webtorrent."
 cleanup # cleanup before launching webtorrent
 webtorrent "$magnet" --$player --not-on-top --playlist
 
