@@ -32,6 +32,8 @@ git clone https://github.com/miermontoto/notflix..git
 cd notflix. && sudo make
 ```
 
+For BSD support, see [this](https://github.com/Bugswriter/notflix/issues/62#issuecomment-1013799001)
+
 ## Uninstall
 
 To uninstall, remove `notflix` from your **$PATH**  `sudo rm -f /usr/local/bin/notflix`
