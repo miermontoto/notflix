@@ -5,8 +5,6 @@
 
 **This fork is maintained, but it won't keep up with upstream commits.**
 
-*For BSD support, see [this](https://github.com/Bugswriter/notflix/issues/62#issuecomment-1013799001).*
-
 ## Requirements
 
 * [webtorrent-cli](https://github.com/webtorrent/webtorrent-cli) `sudo npm i -g webtorrent-cli`
